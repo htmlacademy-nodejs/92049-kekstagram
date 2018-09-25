@@ -1,16 +1,16 @@
 class Messages {
-  static WELCOME(application) {
+  static getWelcome(application) {
     return `Привет пользователь!
     Эта программа будет запускать сервер «${application}».
     Автор: Артамонов Евгений.`;
   }
 
-  static UNKNOWN_KOMMAND(command) {
+  static getUnknownCommand(command) {
     return `Неизвестная команда ${command}.
     Чтобы прочитать правила использования приложения, наберите "--help"`;
   }
 
-  static VERSION() {
+  static getVersion() {
     return `v0.0.1`;
   }
 
@@ -22,8 +22,8 @@ class Messages {
 }
 
 const Commands = {
-  "--help": 'HELP',
-  "--version": 'VERSION',
+  "--help": 'getWelcome',
+  "--version": 'getUnknownCommand',
 };
 
 const handleCommand = command => {
@@ -32,7 +32,7 @@ const handleCommand = command => {
   if (commandKey) {
     console.log(Messages[commandKey](command));
   } else {
-    console.error(Messages.UNKNOWN_KOMMAND(command));
+    console.error(Messages.getUnknownCommand(command));
     process.exit(1);
   }
 };
@@ -43,7 +43,7 @@ const handleCommands = () => {
   const application = __dirname.split('/').pop();
 
   if (!commands.length) {
-    console.log(Messages.WELCOME(application));
+    console.log(Messages.getWelcome(application));
   }
 
   commands.forEach(handleCommand);
