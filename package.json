@@ -1,0 +1,20 @@
+{
+  "name": "kekstagram",
+  "version": "0.0.1",
+  "description": "kekstagram",
+  "main": "index.js",
+  "scripts": {
+    "test:lint": "eslint .",
+    "test": "npm run test:lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-personal:True-Evzheniy/kekstagram.git"
+  },
+  "author": "Eugene Artamonov",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "5.6.0",
+    "eslint-config-htmlacademy": "0.5.2"
+  }
+}
