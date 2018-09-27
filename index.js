@@ -22,11 +22,11 @@ class Messages {
 }
 
 const Commands = {
-  "--help": 'getWelcome',
-  "--version": 'getUnknownCommand',
+  "--help": `getWelcome`,
+  "--version": `getUnknownCommand`
 };
 
-const handleCommand = command => {
+const handleCommand = (command) => {
   const commandKey = Commands[command];
 
   if (commandKey) {
@@ -40,7 +40,7 @@ const handleCommand = command => {
 const handleCommands = () => {
   const {argv} = process;
   const commands = argv.slice(2);
-  const application = __dirname.split('/').pop();
+  const application = __dirname.split(`/`).pop();
 
   if (!commands.length) {
     console.log(Messages.getWelcome(application));
