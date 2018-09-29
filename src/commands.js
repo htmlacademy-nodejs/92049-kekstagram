@@ -1,9 +1,4 @@
-const commandModules = [
-  require(`./version.js`),
-  require(`./help`),
-  require(`./license`),
-  require(`./author`)
-];
+const {commandModules} = require(`./help`);
 const welcome = require(`./welcome`);
 const unknown = require(`./unknown`);
 
