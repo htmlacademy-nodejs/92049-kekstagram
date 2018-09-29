@@ -4,6 +4,6 @@ module.exports = {
   name: `version`,
   description: `Show application version`,
   execute() {
-    console.log(version);
+    console.log(`v${version}`);
   }
 };
