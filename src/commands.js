@@ -26,4 +26,4 @@ const handleCommands = () => {
   commands.forEach(handleCommand);
 };
 
-handleCommands();
+module.exports = handleCommands;

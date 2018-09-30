@@ -1,2 +1,4 @@
-require(`./src/commands`);
+const handleCommands = require(`./src/commands`);
+
+handleCommands();
 
