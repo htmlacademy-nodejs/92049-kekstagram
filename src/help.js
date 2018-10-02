@@ -3,13 +3,19 @@ const commandModules = [
   require(`./license`),
   require(`./author`)
 ];
+const colors = require(`colors/safe`);
 
 const helpModule = {
   name: `help`,
   description: `Show help message`,
   execute() {
     const availableCommands = this.commandModules
-      .map((module) => `--${module.name}    — ${module.description}`)
+      .map(
+          (module) =>
+            `--${colors.gray(module.name).padEnd(20, ` `)} — ${colors.green(
+                module.description
+            )}`
+      )
       .join(`\n`);
 
     console.log(`Available commands:
