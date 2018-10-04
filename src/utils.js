@@ -16,7 +16,7 @@ const getRandomLetter = () => {
 const getRandomWord = (maxLength, minLength = 1) => {
   const length = getRandomInteger(maxLength, minLength);
 
-  return new Array(length).fill(``).map(() => getRandomLetter()).join(``);
+  return Array.from(length).map(() => getRandomLetter()).join(``);
 };
 
 const getRandomString = (maxLength) => {

@@ -10,8 +10,7 @@ const {
 const {getRandomInteger, getRandomWord, getRandomString} = require(`./utils`);
 
 const generateHashtags = () => {
-  return new Array(getRandomInteger(HASHTAG_MAX_QNT))
-    .fill(``)
+  return Array.from({length: HASHTAG_MAX_QNT})
     .reduce((acc) => {
       let hashtag;
 
@@ -26,8 +25,7 @@ const generateHashtags = () => {
 };
 
 const generateComments = () => {
-  return new Array(getRandomInteger(MAX_COMMENT_QNT))
-    .fill(``)
+  return Array.from({length: MAX_COMMENT_QNT})
     .map(() => getRandomString(MAX_STRING_LENGTH));
 };
 
