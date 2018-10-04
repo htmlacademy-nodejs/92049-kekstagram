@@ -31,7 +31,7 @@ describe(`Function generateEntity`, () => {
         hashtags.every((it) => it.length > 0 && it.length <= HASHTAG_MAX_LENGTH)
     );
     assert(hashtags.length <= HASHTAG_MAX_QNT && hashtags.length >= 0);
-    assert(hashtags.every((it) => !it.includes(` `)));
+    assert(hashtags.every((it) => !it.includes(` `) && it.length > 1));
   });
 
   it(`has description`, () => {
@@ -53,3 +53,4 @@ describe(`Function generateEntity`, () => {
     assert(date <= now && date >= now - WEEK);
   });
 });
+
