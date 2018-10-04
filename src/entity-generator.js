@@ -1,5 +1,5 @@
 const {
-  effects,
+  EFFECTS,
   HASHTAG_MAX_QNT,
   HASHTAG_MAX_LENGTH,
   MAX_SCALE,
@@ -41,7 +41,7 @@ const generateEntity = () => {
   return {
     url: `https://picsum.photos/600/?random`,
     scale: getRandomInteger(MAX_SCALE),
-    effect: effects[getRandomInteger(effects.length - 1)],
+    effect: EFFECTS[getRandomInteger(EFFECTS.length - 1)],
     hashtags: generateHashtags(),
     description: getRandomString(MAX_STRING_LENGTH),
     likes: getRandomInteger(1000),

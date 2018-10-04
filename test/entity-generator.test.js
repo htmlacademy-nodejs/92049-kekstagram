@@ -1,7 +1,7 @@
 const assert = require(`assert`);
 const generateEntity = require(`../src/entity-generator`);
 const {
-  effects,
+  EFFECTS,
   MAX_SCALE,
   HASHTAG_MAX_LENGTH,
   HASHTAG_MAX_QNT,
@@ -15,7 +15,7 @@ describe(`Function generateEntity`, () => {
   });
 
   it(`has one of effects`, () => {
-    assert(effects.includes(generateEntity().effect));
+    assert(EFFECTS.includes(generateEntity().effect));
   });
 
   it(`has scale`, () => {
