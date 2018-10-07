@@ -31,7 +31,7 @@ const getRandomString = (maxLength) => {
   return string;
 };
 
-const getYesOrNoDialog = (readline, prompt) => {
+const showYesOrNoDialog = (readline, prompt) => {
   return new Promise((resolve, reject) => {
     const handler = (line) => {
       const preparedLine = line.toLowerCase().trim();
@@ -60,6 +60,6 @@ module.exports = {
   getRandomInteger,
   getRandomWord,
   getRandomString,
-  getYesOrNoDialog,
+  showYesOrNoDialog,
   exitCorrectly
 };

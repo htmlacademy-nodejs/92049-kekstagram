@@ -1,6 +1,10 @@
 const readline = require(`readline`);
-const generate = require(`./generate`);
-const {getYesOrNoDialog} = require(`./utils`);
+const fs = require(`fs`);
+const {showYesOrNoDialog} = require(`./utils`);
+const entityGenerator = require(`./entity-generator`);
+const DEFAULT_PATH = `entities.json`;
+
+const sayBay = () => console.log(`Пока!`);
 
 const createDialog = () => {
   const rl = readline.createInterface({
@@ -8,17 +12,20 @@ const createDialog = () => {
     output: process.stdout
   });
 
-  getYesOrNoDialog(rl, `Сгенерировать данные? `)
-    .then(setElementQuantityDialog)
-    .catch(() => process.exit(0));
+  showYesOrNoDialog(rl, `Сгенерировать данные? `)
+    .then(showElementQuantityDialog)
+    .catch(() => {
+      rl.close();
+      sayBay();
+    });
 };
 
-const setElementQuantityDialog = (rl) => {
+const showElementQuantityDialog = (rl) => {
   const handler = (line) => {
     const preparedAnswer = Number(line);
     if (Number.isInteger(preparedAnswer) && preparedAnswer > 0) {
       rl.removeListener(`line`, handler);
-      setPathDialog(rl, preparedAnswer);
+      showPathDialog(rl, preparedAnswer);
     } else {
       console.log(`Должно быть целое положительное число`);
       rl.prompt();
@@ -30,13 +37,56 @@ const setElementQuantityDialog = (rl) => {
   rl.on(`line`, handler);
 };
 
-const setPathDialog = (rl, quantity) => {
+const showPathDialog = (rl, quantity) => {
   const handler = (path) => {
-    generate.execute(rl, quantity, path ? path : undefined);
+    checkPath(rl, path ? path : DEFAULT_PATH, quantity);
   };
-  rl.setPrompt(`Укажите путь к файлу `);
+  rl.setPrompt(`Укажите путь к файлу(${DEFAULT_PATH}) `);
   rl.prompt();
   rl.on(`line`, handler);
+};
+
+const checkPath = (rl, path, quantity) => {
+  fs.open(path, `wx`, (error, fd) => {
+    if (error) {
+      if (error.code === `EEXIST`) {
+        showYesOrNoDialog(rl, `Файл существует, перезаписать?`)
+          .then(() => {
+            console.log(`--------`);
+            writeFile(rl, path, quantity);
+          });
+        return;
+      }
+
+      if (error.code === `ENOENT`) {
+        console.log(`Некорректный путь`);
+        showPathDialog(rl, path, quantity);
+        return;
+      }
+
+      throw error;
+    }
+    fs.close(fd, () => {
+      writeFile(rl, path, quantity);
+    });
+  });
+};
+
+const writeFile = (rl, path, quantity) => {
+  const data = Array.from({length: quantity}).map(() =>
+    JSON.stringify(entityGenerator.execute())
+  );
+
+  fs.writeFile(path, data, (error) => {
+    console.log(path);
+    if (error) {
+      throw error;
+    }
+    rl.setPrompt(`Файл успешно записан`);
+    rl.prompt();
+    rl.close();
+    sayBay();
+  });
 };
 
 module.exports = {
