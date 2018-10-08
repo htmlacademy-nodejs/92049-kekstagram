@@ -31,35 +31,11 @@ const getRandomString = (maxLength) => {
   return string;
 };
 
-const showYesOrNoDialog = (readline, prompt) => {
-  return new Promise((resolve, reject) => {
-    const handler = (line) => {
-      const preparedLine = line.toLowerCase().trim();
-      switch (preparedLine) {
-        case `y`:
-          readline.removeListener(`line`, handler);
-          resolve(readline);
-          break;
-        case `n`:
-          reject(readline);
-          break;
-        default:
-          console.log(`Наберите "Y" или "N"`);
-          readline.prompt();
-      }
-    };
-    readline.setPrompt(prompt);
-    readline.prompt();
-    readline.on(`line`, handler);
-  });
-};
-
 const exitCorrectly = () => process.exit(0);
 
 module.exports = {
   getRandomInteger,
   getRandomWord,
   getRandomString,
-  showYesOrNoDialog,
   exitCorrectly
 };
