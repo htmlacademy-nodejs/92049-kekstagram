@@ -1,5 +1,5 @@
 const assert = require(`assert`);
-const generateEntity = require(`../src/entity-generator`);
+const entityGenerator = require(`../src/entity-generator`);
 const {
   EFFECTS,
   MAX_SCALE,
@@ -8,6 +8,8 @@ const {
   MAX_STRING_LENGTH,
   WEEK
 } = require(`../src/constants`);
+
+const generateEntity = entityGenerator.execute;
 
 describe(`Function generateEntity`, () => {
   it(`has url with link to random image`, () => {
