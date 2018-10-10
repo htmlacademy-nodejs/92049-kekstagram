@@ -3,6 +3,11 @@ const fs = require(`fs`);
 const entityGenerator = require(`./entity-generator`);
 const DEFAULT_PATH = `entities.json`;
 const DEFAULT_QUANTITY = 1;
+const PathInputAnswers = {
+  CORRECT: `correct`,
+  EXIST: `exist`,
+  WRONG: `wrong`
+};
 
 const readline = Readline.createInterface({
   input: process.stdin,
@@ -11,16 +16,16 @@ const readline = Readline.createInterface({
 let quantity;
 let path;
 
-const yesOrNo = (prompt, cbYes, cbNo) => {
+const yesOrNo = (prompt, cb) => {
   const handler = (line) => {
     const preparedLine = line.toLowerCase().trim();
     switch (preparedLine) {
       case `y`:
         readline.removeListener(`line`, handler);
-        cbYes();
+        cb(true);
         break;
       case `n`:
-        cbNo();
+        cb(false);
         break;
       default:
         console.log(`Наберите "Y" или "N"`);
@@ -38,11 +43,14 @@ const sayBye = () => {
 };
 
 const createDialog = () => {
-  yesOrNo(`Сгенерировать данные? `, showQuantityDialog, sayBye
-  );
+  yesOrNo(`Сгенерировать данные? `, showQuantityDialog);
 };
 
-const showQuantityDialog = () => {
+const showQuantityDialog = (answer) => {
+  if (!answer) {
+    return sayBye();
+  }
+
   const handler = (line) => {
     const preparedLine = Number(line ? line : DEFAULT_QUANTITY);
 
@@ -64,7 +72,7 @@ const showQuantityDialog = () => {
 const showPathDialog = () => {
   const handler = (line) => {
     path = line ? line : DEFAULT_PATH;
-    checkPath(writeFile, showWrongPathDialog, showRewrightDialog);
+    checkPath(handlePathInput);
     readline.removeListener(`line`, handler);
   };
 
@@ -73,24 +81,37 @@ const showPathDialog = () => {
   readline.on(`line`, handler);
 };
 
-const checkPath = (correctCb, incorrectCb, existCb) => {
+const checkPath = (cb) => {
   fs.open(path, `wx`, (error, fd) => {
     if (error) {
       if (error.code === `ENOENT`) {
-        incorrectCb();
+        cb(PathInputAnswers.WRONG);
         return;
       }
 
       if (error.code === `EEXIST`) {
-        existCb();
+        cb(PathInputAnswers.EXIST);
         return;
       }
 
       throw error;
     }
 
-    fs.close(fd, correctCb);
+    fs.close(fd, () => cb(PathInputAnswers.CORRECT));
   });
+};
+
+const handlePathInput = (answer) => {
+  switch (answer) {
+    case PathInputAnswers.CORRECT:
+      writeFile();
+      break;
+    case PathInputAnswers.WRONG:
+      showWrongPathDialog();
+      break;
+    case PathInputAnswers.EXIST:
+      showRewrightDialog();
+  }
 };
 
 const showWrongPathDialog = () => {
@@ -99,8 +120,10 @@ const showWrongPathDialog = () => {
 };
 
 const writeFile = () => {
-  const data = JSON.stringify(Array.from({length: quantity}).map(entityGenerator.execute));
-  fs.writeFile(path, data, (error)=> {
+  const data = JSON.stringify(
+      Array.from({length: quantity}).map(entityGenerator.execute)
+  );
+  fs.writeFile(path, data, (error) => {
     if (error) {
       throw error;
     }
@@ -110,10 +133,17 @@ const writeFile = () => {
   });
 };
 
-const showRewrightDialog = () => {
-  yesOrNo(`Файл существует. Переписать?`, writeFile, sayBye);
+const handleRewrightInput = (answer) => {
+  if (!answer) {
+    return sayBye();
+  }
+
+  writeFile();
 };
 
+const showRewrightDialog = () => {
+  yesOrNo(`Файл существует. Переписать?`, handleRewrightInput);
+};
 
 module.exports = {
   execute: createDialog
