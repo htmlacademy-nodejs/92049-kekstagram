@@ -66,6 +66,7 @@ const showQuantityDialog = (answer) => {
 
   readline.setPrompt(`Введите количество (${DEFAULT_QUANTITY})`);
   readline.prompt();
+
   readline.on(`line`, handler);
 };
 
@@ -138,7 +139,7 @@ const handleRewrightInput = (answer) => {
     return sayBye();
   }
 
-  writeFile();
+  return writeFile();
 };
 
 const showRewrightDialog = () => {
