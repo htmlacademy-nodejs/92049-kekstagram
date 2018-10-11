@@ -48,7 +48,8 @@ const createDialog = () => {
 
 const showQuantityDialog = (answer) => {
   if (!answer) {
-    return sayBye();
+    sayBye();
+    return;
   }
 
   const handler = (line) => {
@@ -136,10 +137,11 @@ const writeFile = () => {
 
 const handleRewrightInput = (answer) => {
   if (!answer) {
-    return sayBye();
+    sayBye();
+    return;
   }
 
-  return writeFile();
+  writeFile();
 };
 
 const showRewrightDialog = () => {
