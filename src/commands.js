@@ -4,12 +4,13 @@ const unknown = require(`./unknown`);
 const makeDialog = require(`./dialogs`);
 
 
-const handleCommand = (command) => {
+const handleCommand = (paramCommand) => {
+  const [command, param] = paramCommand.split(`=`);
   const commandModule = commandModules.find(
       (module) => `--${module.name}` === command
   );
   if (commandModule) {
-    commandModule.execute(command);
+    commandModule.execute(command, param);
   } else {
     unknown.execute(command);
     process.exit(1);

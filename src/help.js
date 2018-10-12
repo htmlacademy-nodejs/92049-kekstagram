@@ -1,7 +1,8 @@
 const commandModules = [
   require(`./version.js`),
   require(`./license`),
-  require(`./author`)
+  require(`./author`),
+  require(`./server`)
 ];
 const colors = require(`colors/safe`);
 
