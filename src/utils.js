@@ -31,8 +31,11 @@ const getRandomString = (maxLength) => {
   return string;
 };
 
+const exitCorrectly = () => process.exit(0);
+
 module.exports = {
   getRandomInteger,
   getRandomWord,
-  getRandomString
+  getRandomString,
+  exitCorrectly
 };

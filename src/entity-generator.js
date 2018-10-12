@@ -48,4 +48,6 @@ const generateEntity = () => {
   };
 };
 
-module.exports = generateEntity;
+module.exports = {
+  execute: generateEntity
+};

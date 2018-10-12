@@ -1,6 +1,8 @@
 const {commandModules} = require(`./help`);
 const welcome = require(`./welcome`);
 const unknown = require(`./unknown`);
+const makeDialog = require(`./dialogs`);
+
 
 const handleCommand = (command) => {
   const commandModule = commandModules.find(
@@ -20,10 +22,10 @@ const handleCommands = () => {
 
   if (!commands.length) {
     welcome.execute();
-    process.exit(0);
+    makeDialog.execute();
+  } else {
+    commands.forEach(handleCommand);
   }
-
-  commands.forEach(handleCommand);
 };
 
 module.exports = handleCommands;
