@@ -23,7 +23,7 @@ describe(`POST /api/posts`, () => {
       .post(`/api/posts`)
       .field(`description`, testPost.description)
       .attach(`image`, `test/fixtures/car.jpeg`)
-      .set(`Accept`, `multipart/form-data`)
+      .set(`Accept`, `application/json`)
       .set(`Content-Type`, `multipart/form-data`)
       .expect(200)
       .expect(`Content-Type`, /json/);
