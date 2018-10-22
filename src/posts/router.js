@@ -1,7 +1,12 @@
-const {Router} = require(`express`);
+const express = require(`express`);
+const multer = require(`multer`);
 const IllegalArgumentError = require(`../errors/illegal-argument-error`);
 const NotFoundError = require(`../errors/not-found-error`);
 const postGenerator = require(`../entity-generator`);
+const {Router} = express;
+const jsonParser = express.json();
+const upload = multer({storage: multer.memoryStorage()});
+
 
 const POST_MUMBER = 100;
 const DEFAULT_POSTS_LIMIT = 50;
@@ -35,6 +40,11 @@ postsRouter.get(`/:date`, (req, res) => {
   }
 
   res.send(post);
+});
+
+postsRouter.post(``, jsonParser, upload.single(`image`), (req, res) => {
+  const body = req.body;
+  res.send(body);
 });
 
 module.exports = {

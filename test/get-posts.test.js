@@ -68,6 +68,6 @@ describe(`GET /api/posts/:date`, () => {
       .get(`/api/posts/${Date.now() - THREE_WEEK}`)
       .set(`Accept`, `application/json`)
       .expect(404)
-      .expect(`Content-Type`, /html/);
+      .expect(`Content-Type`, /json/);
   });
 });
