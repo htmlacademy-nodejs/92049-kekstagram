@@ -21,7 +21,7 @@ const generateHashtags = () => {
       acc.push(`#${hashtag}`);
 
       return acc;
-    }, []);
+    }, []).join(` `);
 };
 
 const generateComments = () => {
@@ -37,6 +37,7 @@ const generateDate = () => {
 
 const generateEntity = () => {
   return {
+    filename: {mimetype: `image/jpg`},
     url: `https://picsum.photos/600/?random`,
     scale: getRandomInteger(MAX_SCALE),
     effect: EFFECTS[getRandomInteger(EFFECTS.length - 1)],

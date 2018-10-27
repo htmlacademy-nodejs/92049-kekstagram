@@ -27,13 +27,13 @@ describe(`Function generateEntity`, () => {
 
   it(`has hashtags`, () => {
     const {hashtags} = generateEntity();
-
-    assert(hashtags.every((it) => it[0] === `#`));
+    const hashtagsArray = hashtags.split(` `);
+    assert(hashtagsArray.every((it) => it[0] === `#`));
     assert(
-        hashtags.every((it) => it.length > 0 && it.length <= HASHTAG_MAX_LENGTH)
+        hashtagsArray.every((it) => it.length > 0 && it.length <= HASHTAG_MAX_LENGTH)
     );
-    assert(hashtags.length <= HASHTAG_MAX_QNT && hashtags.length >= 0);
-    assert(hashtags.every((it) => !it.includes(` `) && it.length > 1));
+    assert(hashtagsArray.length <= HASHTAG_MAX_QNT && hashtagsArray.length >= 0);
+    assert(hashtagsArray.every((it) => !it.includes(` `) && it.length > 1));
   });
 
   it(`has description`, () => {
