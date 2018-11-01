@@ -1,7 +1,10 @@
 const express = require(`express`);
 const http = require(`http`);
 const app = express();
-const {postsRouter} = require(`./posts/router`);
+const {postsRouter: makePostsRouter} = require(`./posts/router`);
+const postsStore = require(`./posts/store`);
+const imageStore = require(`./images/store`);
+const postsRouter = makePostsRouter(postsStore, imageStore);
 
 const notFoundHandler = (req, res) => {
   res.status(404).send(`Page not found`);
