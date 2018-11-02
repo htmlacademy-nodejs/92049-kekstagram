@@ -1,7 +1,11 @@
+const {init} = require(`../src/server`);
+
 const assert = require(`assert`);
 const request = require(`supertest`);
-const {app} = require(`../src/server`);
-const {posts, DEFAULT_POSTS_LIMIT} = require(`../src/posts/router`);
+const imageStoreMock = require(`./mock/image-store-mock`);
+const {postsStoreMock, posts} = require(`./mock/posts-store-mock`);
+const {DEFAULT_POSTS_LIMIT} = require(`../src/posts/router`);
+const app = init(postsStoreMock, imageStoreMock);
 
 describe(`GET /api/posts`, () => {
   it(`respond with json`, async () => {
@@ -10,8 +14,8 @@ describe(`GET /api/posts`, () => {
       .set(`Accept`, `application/json`)
       .expect(200)
       .expect(`Content-Type`, /json/);
-    const data = response.body;
-    assert.equal(data.length, DEFAULT_POSTS_LIMIT);
+    const {body} = response;
+    assert.equal(body.data.length, DEFAULT_POSTS_LIMIT);
   });
 
   it(`get data from unknown resource`, async () => {
@@ -30,7 +34,7 @@ describe(`GET /api/posts`, () => {
       .set(`Accept`, `application/json`)
       .expect(200)
       .expect(`Content-Type`, /json/);
-    const data = response.body;
+    const {data} = response.body;
     assert.equal(data.length, LIMIT);
     assert.equal(posts[LIMIT - 1].date, data[LIMIT - 1].date);
   });
@@ -42,7 +46,7 @@ describe(`GET /api/posts`, () => {
       .set(`Accept`, `application/json`)
       .expect(200)
       .expect(`Content-Type`, /json/);
-    const data = response.body;
+    const {data} = response.body;
     assert.equal(data.length, DEFAULT_POSTS_LIMIT);
     assert.equal(posts[SKIP + DEFAULT_POSTS_LIMIT - 1].date, data[DEFAULT_POSTS_LIMIT - 1].date);
   });

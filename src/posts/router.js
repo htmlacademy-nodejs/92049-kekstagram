@@ -3,56 +3,128 @@ const multer = require(`multer`);
 const IllegalArgumentError = require(`../errors/illegal-argument-error`);
 const NotFoundError = require(`../errors/not-found-error`);
 const ValidationError = require(`../errors/validation-error`);
-const postGenerator = require(`../entity-generator`);
 const {Router} = express;
 const jsonParser = express.json();
 const upload = multer({storage: multer.memoryStorage()});
 const validate = require(`../validate`);
+const toStream = require(`buffer-to-stream`);
 
-const POST_MUMBER = 100;
 const DEFAULT_POSTS_LIMIT = 50;
 const DEFAULT_SKIP = 0;
 
 const postsRouter = new Router();
-const posts = Array.from({length: POST_MUMBER}).map(() =>
-  postGenerator.execute()
+
+const asyncMiddleware = (fn) => (req, res, next) =>
+  fn(req, res, next).catch(next);
+
+const toPage = async (cursor, skip, limit) => {
+  const data = await cursor
+    .skip(skip)
+    .limit(limit)
+    .toArray();
+
+  return {
+    data,
+    skip,
+    limit,
+    total: await cursor.count()
+  };
+};
+
+postsRouter.get(
+    ``,
+    asyncMiddleware(async (req, res) => {
+      const {limit = DEFAULT_POSTS_LIMIT, skip = DEFAULT_SKIP} = req.query;
+      const limitNumber = parseInt(limit, 10);
+      const skipNumber = parseInt(skip, 10);
+      if (isNaN(limitNumber) || isNaN(skipNumber)) {
+        throw new IllegalArgumentError(`Неверные параметры skip или limit`);
+      }
+
+      res.send(
+          await toPage(
+              await postsRouter.postsStore.getPosts(),
+              skipNumber,
+              limitNumber
+          )
+      );
+    })
 );
 
-postsRouter.get(``, (req, res) => {
-  const {limit = DEFAULT_POSTS_LIMIT, skip = DEFAULT_SKIP} = req.query;
-  const limitNumber = Number(limit);
-  const skipNumber = Number(skip);
+postsRouter.get(
+    `/:date`,
+    asyncMiddleware(async (req, res) => {
+      const date = Number(req.params.date);
 
-  res.send(posts.slice(skipNumber, skipNumber + limitNumber));
-});
+      if (!date) {
+        throw new IllegalArgumentError(`В запросе не указана дата`);
+      }
 
-postsRouter.get(`/:date`, (req, res) => {
-  const date = Number(req.params.date);
+      const post = await postsRouter.postsStore.getPost(date);
 
-  if (!date) {
-    throw new IllegalArgumentError(`В запросе не указана дата`);
-  }
+      if (!post) {
+        throw new NotFoundError(`Пост с датой ${date}  не найден`);
+      }
 
-  const post = posts.find((it) => it.date === date);
+      res.send(post);
+    })
+);
 
-  if (!post) {
-    throw new NotFoundError(`Пост с датой ${date}  не найден`);
-  }
+postsRouter.get(
+    `/:date/image`,
+    asyncMiddleware(async (req, res) => {
+      const date = Number(req.params.date);
 
-  res.send(post);
-});
+      if (!date) {
+        throw new IllegalArgumentError(`В запросе не указана дата`);
+      }
 
-postsRouter.post(``, jsonParser, upload.single(`image`), (req, res) => {
-  const {body, file} = req;
+      const post = await postsRouter.postsStore.getPost(date);
 
-  if (file) {
-    const {mimetype} = file;
-    body.filename = {
-      mimetype
-    };
-  }
-  res.send(validate(body));
-});
+      if (!post) {
+        throw new NotFoundError(`Пост с датой ${date}  не найден`);
+      }
+
+      const image = await postsRouter.imageStore.get(post._id);
+      res.header(`Content-Type`, `image/jpg`);
+      res.header(`Content-Length`, image.info.length);
+
+      res.on(`error`, (e) => console.error(e));
+      res.on(`end`, () => res.end());
+      const stream = image.stream;
+      stream.on(`error`, (e) => console.error(e));
+      stream.on(`end`, () => res.end());
+      stream.pipe(res);
+    })
+);
+
+postsRouter.post(
+    ``,
+    jsonParser,
+    upload.single(`image`),
+    asyncMiddleware(async (req, res) => {
+      const {body, file} = req;
+
+      if (file) {
+        const {mimetype} = file;
+        body.filename = {
+          mimetype
+        };
+      }
+
+      const validated = validate(body);
+      const result = await postsRouter.postsStore.savePost(
+          Object.assign(validated, {date: Date.now()})
+      );
+      const insertedId = result.insertedId;
+
+      if (file) {
+        await postsRouter.imageStore.save(insertedId, toStream(file.buffer));
+      }
+
+      res.send(validated);
+    })
+);
 
 postsRouter.use((error, req, res, next) => {
   if (error instanceof ValidationError) {
@@ -65,7 +137,11 @@ postsRouter.use((error, req, res, next) => {
 });
 
 module.exports = {
-  postsRouter,
-  posts,
+  postsRouter: (postsStore, imageStore) => {
+    postsRouter.postsStore = postsStore;
+    postsRouter.imageStore = imageStore;
+
+    return postsRouter;
+  },
   DEFAULT_POSTS_LIMIT
 };

@@ -1,10 +1,12 @@
 const assert = require(`assert`);
 const request = require(`supertest`);
-const {app} = require(`../src/server`);
-const generatePost = require(`../src/entity-generator`).execute;
-
-const testPost = generatePost();
+const {init} = require(`../src/server`);
+const imageStoreMock = require(`./mock/image-store-mock`);
+const {postsStoreMock, posts} = require(`./mock/posts-store-mock`);
+const app = init(postsStoreMock, imageStoreMock);
+const testPost = posts[0];
 testPost.filename = {mimetype: `image/jpg`};
+
 const {description, effect, hashtags, scale} = testPost;
 
 describe(`POST /api/posts`, () => {
@@ -16,6 +18,9 @@ describe(`POST /api/posts`, () => {
       .set(`Content-Type`, `application/json`)
       .expect(200)
       .expect(`Content-Type`, /json/);
+
+    delete response.body.date;
+    delete testPost.date;
 
     assert.deepEqual(testPost, response.body);
   });
@@ -55,7 +60,7 @@ describe(`POST /api/posts`, () => {
   });
 
   it(`sends post with repeating hashtags`, async () => {
-    const post = generatePost();
+    const post = Object.assign({}, testPost);
     post.hashtags = `#same #same #one #two #three`;
 
     const response = await request(app)
@@ -69,7 +74,7 @@ describe(`POST /api/posts`, () => {
   });
 
   it(`sends post with extra hashtags`, async () => {
-    const post = generatePost();
+    const post = Object.assign({}, testPost);
     post.hashtags = `#one #two #three #four #five #six`;
 
     const response = await request(app)
@@ -83,7 +88,7 @@ describe(`POST /api/posts`, () => {
   });
 
   it(`sends post with extra hashtags`, async () => {
-    const post = generatePost();
+    const post = Object.assign({}, testPost);
     post.hashtags = `#one #two #three #four #five #six`;
 
     const response = await request(app)
@@ -97,7 +102,7 @@ describe(`POST /api/posts`, () => {
   });
 
   it(`sends post with hashtag without #`, async () => {
-    const post = generatePost();
+    const post = Object.assign({}, testPost);
     post.hashtags = `one #two #three #four #five`;
 
     const response = await request(app)
@@ -111,7 +116,7 @@ describe(`POST /api/posts`, () => {
   });
 
   it(`sends post with hashtag without space between items`, async () => {
-    const post = generatePost();
+    const post = Object.assign({}, testPost);
     post.hashtags = `#one#two #three #four #five`;
 
     const response = await request(app)
@@ -125,7 +130,7 @@ describe(`POST /api/posts`, () => {
   });
 
   it(`sends post with long description`, async () => {
-    const post = generatePost();
+    const post = Object.assign({}, testPost);
     post.description = Array.from({length: 142}).join(`a`);
 
     const response = await request(app)
