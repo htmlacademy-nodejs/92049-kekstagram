@@ -3,22 +3,16 @@ const multer = require(`multer`);
 const IllegalArgumentError = require(`../errors/illegal-argument-error`);
 const NotFoundError = require(`../errors/not-found-error`);
 const ValidationError = require(`../errors/validation-error`);
-const postGenerator = require(`../entity-generator`);
 const {Router} = express;
 const jsonParser = express.json();
 const upload = multer({storage: multer.memoryStorage()});
 const validate = require(`../validate`);
 const toStream = require(`buffer-to-stream`);
 
-
-const POST_NUMBER = 100;
 const DEFAULT_POSTS_LIMIT = 50;
 const DEFAULT_SKIP = 0;
 
 const postsRouter = new Router();
-const posts = Array.from({length: POST_NUMBER}).map(() =>
-  postGenerator.execute()
-);
 
 const asyncMiddleware = (fn) => (req, res, next) =>
   fn(req, res, next).catch(next);
@@ -76,30 +70,33 @@ postsRouter.get(
     })
 );
 
-postsRouter.get(`/:date/image`, asyncMiddleware(async (req, res) => {
-  const date = Number(req.params.date);
+postsRouter.get(
+    `/:date/image`,
+    asyncMiddleware(async (req, res) => {
+      const date = Number(req.params.date);
 
-  if (!date) {
-    throw new IllegalArgumentError(`В запросе не указана дата`);
-  }
+      if (!date) {
+        throw new IllegalArgumentError(`В запросе не указана дата`);
+      }
 
-  const post = await postsRouter.postsStore.getPost(date);
+      const post = await postsRouter.postsStore.getPost(date);
 
-  if (!post) {
-    throw new NotFoundError(`Пост с датой ${date}  не найден`);
-  }
+      if (!post) {
+        throw new NotFoundError(`Пост с датой ${date}  не найден`);
+      }
 
-  const image = await postsRouter.imageStore.get(post._id);
-  res.header(`Content-Type`, `image/jpg`);
-  res.header(`Content-Length`, image.info.length);
+      const image = await postsRouter.imageStore.get(post._id);
+      res.header(`Content-Type`, `image/jpg`);
+      res.header(`Content-Length`, image.info.length);
 
-  res.on(`error`, (e) => console.error(e));
-  res.on(`end`, () => res.end());
-  const stream = image.stream;
-  stream.on(`error`, (e) => console.error(e));
-  stream.on(`end`, () => res.end());
-  stream.pipe(res);
-}));
+      res.on(`error`, (e) => console.error(e));
+      res.on(`end`, () => res.end());
+      const stream = image.stream;
+      stream.on(`error`, (e) => console.error(e));
+      stream.on(`end`, () => res.end());
+      stream.pipe(res);
+    })
+);
 
 postsRouter.post(
     ``,
@@ -146,6 +143,5 @@ module.exports = {
 
     return postsRouter;
   },
-  posts,
   DEFAULT_POSTS_LIMIT
 };
