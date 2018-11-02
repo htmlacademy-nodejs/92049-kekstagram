@@ -1,8 +1,6 @@
 const express = require(`express`);
 const http = require(`http`);
 const {postsRouter: makePostsRouter} = require(`./posts/router`);
-const imageStore = require(`./images/store`);
-const postsStore = require(`./posts/store`);
 
 const notFoundHandler = (req, res) => {
   res.status(404).send(`Page not found`);
@@ -40,6 +38,9 @@ module.exports = {
   name: `server`,
   description: `Run server on 3000 port by default`,
   execute: (command, port = DEFAULT_PORT) => {
+    const imageStore = require(`./images/store`);
+    const postsStore = require(`./posts/store`);
+
     init(postsStore, imageStore).listen(port, HOST, () =>
       console.log(`Server running at http://${HOST}:${port}`)
     );
