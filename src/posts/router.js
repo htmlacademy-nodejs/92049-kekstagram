@@ -101,7 +101,7 @@ postsRouter.get(
 postsRouter.post(
     ``,
     jsonParser,
-    upload.single(`image`),
+    upload.single(`filename`),
     asyncMiddleware(async (req, res) => {
       const {body, file} = req;
 
@@ -113,8 +113,9 @@ postsRouter.post(
       }
 
       const validated = validate(body);
+      const date = Date.now();
       const result = await postsRouter.postsStore.savePost(
-          Object.assign(validated, {date: Date.now()})
+          Object.assign(validated, {date, url: `/api/posts/${date}/image`})
       );
       const insertedId = result.insertedId;
 
