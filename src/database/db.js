@@ -1,3 +1,4 @@
+const logger = require(`../logger`);
 const {MongoClient} = require(`mongodb`);
 
 const {DB_HOST = `mongodb://localhost`, DB_PORT = 27017} = process.env;
@@ -9,6 +10,6 @@ module.exports = MongoClient.connect(
 )
   .then((client) => client.db(`kekstagram`))
   .catch((error) => {
-    console.error(`Filed to connect to MongoDB `, error);
+    logger.error(`Filed to connect to MongoDB `, error);
     process.exit(1);
   });

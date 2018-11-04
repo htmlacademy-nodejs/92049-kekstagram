@@ -1,4 +1,4 @@
-
+const logger = require(`./logger`);
 const express = require(`express`);
 const http = require(`http`);
 const {postsRouter: makePostsRouter} = require(`./posts/router`);
@@ -19,7 +19,7 @@ const init = (storeOfData, storeOfImages) => {
 
   app.use((error, req, res, _next) => {
     if (error) {
-      console.error(error);
+      logger.error(error);
       const {code = 500, message} = error;
 
       res.status(code).send([
@@ -42,7 +42,7 @@ module.exports = {
     const postsStore = require(`./posts/store`);
 
     init(postsStore, imageStore).listen(port, SERVER_HOST, () =>
-      console.log(`Server running at http://${SERVER_HOST}:${port}`)
+      logger.info(`Server running at http://${SERVER_HOST}:${port}`)
     );
   },
   init

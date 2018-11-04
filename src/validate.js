@@ -1,3 +1,5 @@
+const logger = require(`./logger`);
+
 const {
   EFFECTS,
   HASHTAG_MAX_LENGTH,
@@ -84,7 +86,7 @@ const validate = (data) => {
   }
 
   if (errors.length) {
-    console.log(errors);
+    logger.log(errors);
 
     throw new ValidationError(errors);
   }
