@@ -1,7 +1,7 @@
-
 const {createLogger, format, transports} = require(`winston`);
 const {json, simple, combine, timestamp} = format;
 const {Console, File} = transports;
+
 const stack = format((info) => {
   if (info instanceof Error) {
     return Object.assign({}, info, {
@@ -9,6 +9,7 @@ const stack = format((info) => {
       message: info.message
     });
   }
+
   return info;
 });
 const logger = createLogger({
@@ -19,6 +20,7 @@ const logger = createLogger({
     new File({filename: `logs/combined.log`})
   ]
 });
+
 if (process.env.NODE_ENV !== `production`) {
   logger.add(
       new Console({
@@ -27,4 +29,5 @@ if (process.env.NODE_ENV !== `production`) {
       })
   );
 }
+
 module.exports = logger;
