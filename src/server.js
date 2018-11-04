@@ -1,3 +1,4 @@
+require(`dotenv`).config();
 const logger = require(`./logger`);
 const express = require(`express`);
 const http = require(`http`);
@@ -7,11 +8,17 @@ const notFoundHandler = (req, res) => {
   res.status(404).send(`Page not found`);
 };
 
-const {SERVER_PORT = 3000, SERVER_HOST = `localhost`} = process.env;
+const allowCORS = (req, res, next) => {
+  res.header(`Access-Control-Allow-Origin`, `*`);
+  res.header(`Access-Control-Allow-Headers`, `Origin, X-Requested-With, Content-Type, Accept`);
+  next();
+};
 
+const {SERVER_PORT = 3000, SERVER_HOST = `localhost`} = process.env;
 const init = (storeOfData, storeOfImages) => {
   const app = express();
   const postsRouter = makePostsRouter(storeOfData, storeOfImages);
+  app.use(allowCORS);
   app.use(express.static(`${__dirname}/../static`));
   app.use(`/api/posts`, postsRouter);
 
