@@ -8,6 +8,7 @@ const jsonParser = express.json();
 const upload = multer({storage: multer.memoryStorage()});
 const validate = require(`../validate`);
 const toStream = require(`buffer-to-stream`);
+const logger = require(`../logger`);
 
 const DEFAULT_POSTS_LIMIT = 50;
 const DEFAULT_SKIP = 0;
@@ -89,10 +90,10 @@ postsRouter.get(
       res.header(`Content-Type`, `image/jpg`);
       res.header(`Content-Length`, image.info.length);
 
-      res.on(`error`, (e) => console.error(e));
+      res.on(`error`, (e) => logger.error(e));
       res.on(`end`, () => res.end());
       const stream = image.stream;
-      stream.on(`error`, (e) => console.error(e));
+      stream.on(`error`, (e) => logger.error(e));
       stream.on(`end`, () => res.end());
       stream.pipe(res);
     })
@@ -101,7 +102,7 @@ postsRouter.get(
 postsRouter.post(
     ``,
     jsonParser,
-    upload.single(`image`),
+    upload.single(`filename`),
     asyncMiddleware(async (req, res) => {
       const {body, file} = req;
 
@@ -113,8 +114,9 @@ postsRouter.post(
       }
 
       const validated = validate(body);
+      const date = Date.now();
       const result = await postsRouter.postsStore.savePost(
-          Object.assign(validated, {date: Date.now()})
+          Object.assign(validated, {date, url: `/api/posts/${date}/image`})
       );
       const insertedId = result.insertedId;
 

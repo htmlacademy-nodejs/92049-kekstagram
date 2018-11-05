@@ -19,9 +19,11 @@ describe(`POST /api/posts`, () => {
       .expect(200)
       .expect(`Content-Type`, /json/);
 
+    assert(/\/api\/posts\/[0-9]*\/image/.test(response.body.url));
     delete response.body.date;
     delete testPost.date;
-
+    delete response.body.url;
+    delete testPost.url;
     assert.deepEqual(testPost, response.body);
   });
 
@@ -32,7 +34,7 @@ describe(`POST /api/posts`, () => {
       .field(`effect`, effect)
       .field(`hashtags`, hashtags)
       .field(`scale`, scale)
-      .attach(`image`, `test/fixtures/car.jpeg`)
+      .attach(`filename`, `test/fixtures/car.jpeg`)
       .set(`Accept`, `application/json`)
       .set(`Content-Type`, `multipart/form-data`)
       .expect(200)
